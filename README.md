@@ -10,20 +10,40 @@ It enables AI assistants to control a browser through a set of tools, allowing t
 
 The server can be used with various AI platforms including Cloudflare AI Playground, Claude Desktop, and GitHub Copilot in VS Code.
 
-### Deploy
+### Code Structure
 
-Follow these steps to set up and deploy the project:
+The main logic of the Cloudflare Worker is in the `src/index.ts` file. Here's a quick overview of its structure:
 
-1. Install dependencies:
-```bash
-npm ci
-```
+-   **`PlaywrightMCP`**: This constant initializes the Playwright MCP agent. It uses the `BROWSER` binding, which is configured in `wrangler.toml` to provide access to a browser instance.
+-   **`export default`**: This is the main worker object that Cloudflare's runtime executes.
+    -   **`fetch(request, env, ctx)`**: This is the entry point for all incoming HTTP requests. It inspects the request's path to route it to the appropriate MCP service endpoint (`/sse` for Server-Sent Events or `/mcp` for the standard endpoint). If the path doesn't match, it returns a 404 Not Found response.
 
-2. Deploy to Cloudflare Workers:
+### Setup and Deployment
+
+This project is written in TypeScript and uses [Wrangler](https://developers.cloudflare.com/workers/wrangler/) for deployment to Cloudflare Workers.
+
+#### Development Environment
+
+To set up the development environment, you'll need [Node.js](https://nodejs.org/) and [npm](https://www.npmjs.com/) installed.
+
+1.  **Install Dependencies**: Install the project dependencies using npm:
+    ```bash
+    npm ci
+    ```
+2.  **Build**: The project is written in TypeScript and needs to be compiled to JavaScript before deployment. The `build` script in `package.json` handles this. You can run it manually if you wish:
+    ```bash
+    npm run build
+    ```
+
+#### Deployment
+
+To deploy the worker to your Cloudflare account, you can use the `deploy` script in `package.json`, which runs `wrangler deploy`.
 
 ```bash
 npx wrangler deploy
 ```
+
+This command will build and deploy your worker. Make sure you have authenticated Wrangler with your Cloudflare account. See the [Wrangler documentation](https://developers.cloudflare.com/workers/wrangler/get-started/#2-install-wrangler) for more information.
 
 ### Use with Cloudflare AI Playground
 
